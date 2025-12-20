@@ -1,4 +1,4 @@
-!(import! &self ../temporal/lib_nars_temporal)
+!(import! &self (library estream temporal/lib_nars_temporal))
 
 ;Just helper interface for convenient input and query:
 (= (AddSeq $inp)

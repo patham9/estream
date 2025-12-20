@@ -1,4 +1,4 @@
-!(import! &self ../lib_nars)
+!(import! &self (library estream lib_nars))
 
 (= (kbitem) (Sentence ((--> cat animal) (stv 1.0 0.9)) (-1)))
 (= (kbitem) (Sentence ((--> car machine) (stv 1.0 0.9)) (-1)))
