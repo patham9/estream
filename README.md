@@ -4,3 +4,19 @@
 
 E-Stream is written in MeTTa and executed efficiently using the PeTTa compiler.
 
+## Installation
+
+Clone directly into PeTTa directory:
+
+```
+cd PeTTa
+git clone https://github.com/patham9/estream
+cd estream
+sh test.sh
+```
+
+or to run a concrete example:
+
+```
+sh ../run.sh ./examples/test1.metta
+```
