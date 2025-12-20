@@ -1,4 +1,4 @@
-!(import! &self lib_nars)
+!(import! &self ../lib_nars)
 
 !(AddSeq ((x) (a b c) (c d)))
 
