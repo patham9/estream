@@ -1,4 +1,4 @@
-!(import! &self (library estream declarative/lib_nars_declarative))
+!(import! &self (library estream declarative/control))
 !(import! &self (library estream temporal/lib_fifo))
 !(import! &self (library lib_spaces))
 !(import! &self (library lib_combinatorics))

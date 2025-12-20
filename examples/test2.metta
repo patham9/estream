@@ -1,4 +1,4 @@
-!(import! &self (library estream lib_nars))
+!(import! &self (library estream lib_estream))
 
 !(AddSeq ((x) (a b c) (c d)))
 
