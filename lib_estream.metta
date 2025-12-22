@@ -1,4 +1,4 @@
-!(import! &self (library estream temporal/control))
+!(import! &self (library estream procedural/control))
 
 ;Just helper interface for convenient input and query:
 (= (AddSeq $inp)

@@ -6,6 +6,8 @@ os.chdir(os.path.abspath(os.path.join(orig_cwd, './python/')))
 from petta import *
 os.chdir(orig_cwd)
 
+#BEFORE RUNNING PLEASE ENSURE TO SET IN temporal/control.metta: (= (maxsequencelen) 30)
+
 text = "I went to the fridge. I opened it. I took out the coke. The coke fell to the floor. Then I picked it up. Finally I drank it. "
 text += "I went to the fridge. I opened it. I took out the pizza. The pizza fell to the floor. Then I put it to the trash. "
 
@@ -17,7 +19,7 @@ text += "I ran to the fridge. I opened it. I took out the bread. The bread fell 
 text = text * 5
 
 metta = PeTTa()
-metta.load_metta_file("./pettanars/lib_nars.metta")
+metta.load_metta_file("./estream/lib_estream.metta")
 enc = tiktoken.get_encoding("o200k_base")
 
 todo = enc.encode(text)
