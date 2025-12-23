@@ -1,15 +1,6 @@
 !(import! &self (library estream declarative/truth_functions))
 !(import! &self (library estream declarative/inference_rules))
 
-;;How many derivation steps (task selections)
-(= (NARS.Config.MaxSteps) 100)
-
-;;Size of active tasks PQ
-(= (NARS.Config.TaskQueueSize) 10)
-
-;;Max beliefs buffer size
-(= (NARS.Config.BeliefQueueSize) 100)
-
 ;;Whether evidence was just counted once
 (= (StampDisjoint $Ev1 $Ev2)
    (== () (collapse (let* (($x (superpose $Ev1))
@@ -71,5 +62,5 @@
                                          $taskqueuesize
                                          $beliefqueuesize))))))
 
-(= (NARS.Derive $Bidrectional $Tasks $Beliefs $maxsteps $taskqueuesize $beliefqueuesize)
+(= (NARS.Derive $Bidrectional $Tasks $Beliefs ($maxsteps $taskqueuesize $beliefqueuesize))
    (NARS.Derive $Bidrectional $Tasks $Beliefs 1 $maxsteps $taskqueuesize $beliefqueuesize))

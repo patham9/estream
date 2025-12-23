@@ -2,12 +2,7 @@
 !(import! &self (library estream temporal/lib_fifo))
 !(import! &self (library lib_spaces))
 !(import! &self (library lib_combinatorics))
-!(import! &self (library lib_roman))
-
-;Configuration:
-(= (maxsequencelen) 3) ; 30)
-(= (maxparconjlen) 3)
-(= (kbitem) (empty))
+!(import! &self (library lib_patrick))
 
 ;Running evidence id:
 !(bind! &id (new-state 0))
@@ -18,19 +13,19 @@
 (= (build_sequence_step $Connector $OptionsA $OptionsB)
    (if (== $OptionsA Nil)
        $OptionsB
-       (let* (((Sentence ($ATerm $ATV) $AEv) (superpose $OptionsA))
-              ((Sentence ($BTerm $BTV) $BEv) (superpose $OptionsB)))
-             (if (StampDisjoint $AEv $BEv)
-                 ((Sentence ((if (= $ATerm (cons $Connector $Seq))
-                                 (cons $Connector (append $Seq ($BTerm)))
-                                 ($Connector $ATerm $BTerm))
-                             (Truth_Sequence $ATV $BTV))
-                            (StampConcat $AEv $BEv)))))))
+       (for (Sentence ($ATerm $ATV) $AEv) $OptionsA
+            (for (Sentence ($BTerm $BTV) $BEv) $OptionsB
+                 (if (StampDisjoint $AEv $BEv)
+                     ((Sentence ((if (= $ATerm (cons $Connector $Seq))
+                                     (cons $Connector (append $Seq ($BTerm)))
+                                     ($Connector $ATerm $BTerm))
+                                 (Truth_Sequence $ATV $BTV))
+                                (StampConcat $AEv $BEv))))))))
 
 ;Build the possible sequences from the FIFO:
 (= (FIFOSequences)
    (let* (($fifo (reverse (EventList)))
-          ($length (range 1 (+ 1 (min (length $fifo) (maxsequencelen))))))
+          ($length (range 1 (+ 1 (min (length $fifo) (Temporal.MaxSequenceLength))))))
          (foldl-atom (reverse (takeK $length $fifo)) Nil (build_sequence_step &/))))
 
 ;Anticipation: go through all sequences, and then retrieve all =/> concepts with that sequence as prediction
@@ -73,14 +68,12 @@
                    ((remove-atom &concepts (Concept $key $prekey $conskey $w))
                     (add-atom &concepts (Concept $key $prekey $conskey $updated)))))))
 
-
-(= (SequLen (cons &| $rest))
-   (progn (cut) (length $rest)))
-(= (SequLen $other) 1)
+;Length of parallel conjunction:
+(= (ConjunctionLen (cons &| $rest)) (progn (cut) (length $rest)))
+(= (ConjunctionLen $other) 1)
 
 ;Truth expectation to rank the predictions according to chance of occurrence
-(= (ExpectationRank (($postcon $label $hypterm) $tv)) (let $cardinality_P (SequLen $postcon)
-                                                           (* (sqrt-math $cardinality_P) (Truth_Expectation $tv))))
+(= (ExpectationRank (($postcon $label $hypterm) $tv)) (* (sqrt-math (ConjunctionLen $postcon)) (Truth_Expectation $tv)))
 (= (ExpectationRank ()) -9999)
 
 ;Addon to show the best prediction and hypothesis it is based on:
@@ -99,15 +92,14 @@
 (= (AddEvent $term $adapting)
    (let* (($tmpper (println! (PERCEIVED $term)))
           ;1. Add each term as an event:
-          ($obs (collapse (let $evterm (superpose $term)
-                                       (Sentence ($evterm (stv 1.0 0.9)) ((id))))))
+          ($obs (collapse (for $evterm $term (Sentence ($evterm (stv 1.0 0.9)) ((id))))))
           ;2. Add declarative inference reults from each event considering our kb, subtracting kb items from the results:
-          ($dec (subtraction-atom (list_to_set (append $obs (foldl-atom (collapse (let $s (superpose $obs) 
-                                                                                       (second-from-pair (NARS.Derive False ($s) (collapse (kbitem)) 1 10 10))))
+          ($params ((Declarative.MaxSteps) (Declarative.TaskQueueSize) (Declarative.BeliefQueueSize)))
+          ($dec (subtraction-atom (list_to_set (append $obs (foldl-atom (collapse (for $s $obs (last (NARS.Derive False ($s) (collapse (kbitem)) $params))))
                                                                         () append))) (kb)))
           ($tmpdec (println! (DEC $dec)))
           ;3. Form temporal disjunction between all the inputs and derived events:
-          ($parconj (foldl-atom (collapse (let $k (range 2 (+ 1 (min (maxparconjlen) (length $dec))))
+          ($parconj (foldl-atom (collapse (let $k (range 2 (+ 1 (min (Temporal.MaxParallelConjunctionLength) (length $dec))))
                                                (foldl-atom (map-atom (chooseK $dec $k) (-> ($x) ($x))) Nil (build_sequence_step &|)))) () append))
           ($tmpconc (println! (CONC $parconj)))
           ;4. Novel events (inputs + additional declarative inference results, concurrent conjunctions:
@@ -118,7 +110,7 @@
           ;6. Update FIFO with the novel events:
           ($temp4 (EventPushBounded $novel_events))
           ;7. Update memory with the new temporal induction results:
-          ($hypo (collapse (let $hypo (superpose $hyps) (Add_=/> $hypo))))
+          ($hypo (collapse (for $hypo $hyps (Add_=/> $hypo))))
           ;8. Predict what event is most likely to follow:
           ($pred (collapse (PredictMostLikelyNextEvent)))
           ($tmp2 (println! (PREDICTED $pred)))
