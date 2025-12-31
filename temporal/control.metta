@@ -16,11 +16,13 @@
        (for (Sentence ($ATerm $ATV) $AEv) $OptionsA
             (for (Sentence ($BTerm $BTV) $BEv) $OptionsB
                  (if (StampDisjoint $AEv $BEv)
-                     ((Sentence ((if (= $ATerm (cons $Connector $Seq))
-                                     (cons $Connector (append $Seq ($BTerm)))
-                                     ($Connector $ATerm $BTerm))
-                                 (Truth_Sequence $ATV $BTV))
-                                (StampConcat $AEv $BEv))))))))
+                     (if (or (== $Connector &/)
+                             (!= $BTerm t))
+                         ((Sentence ((if (= $ATerm (cons $Connector $Seq))
+                                         (cons $Connector (append $Seq ($BTerm)))
+                                         ($Connector $ATerm $BTerm))
+                                     (Truth_Sequence $ATV $BTV))
+                                    (StampConcat $AEv $BEv)))))))))
 
 ;Build the possible sequences from the FIFO:
 (= (FIFOSequences)
@@ -44,7 +46,9 @@
           ($newid (id))
           ($anticipations  (collapse (Anticipate $sequence $novelEvents $newid)))
           ((Sentence ($Term2 $STV2) $Ev2) (superpose $novelEvents)))
-         (Sentence ((=/> $Term1 $Term2) (Truth_Eternalize (Truth_Induction $STV1 $STV2))) (StampConcat $Ev1 $Ev2))))
+         (if (and (!= $Term2 t)
+                  (not (is-member t $Term2)))
+             (Sentence ((=/> $Term1 $Term2) (Truth_Eternalize (Truth_Induction $STV1 $STV2))) (StampConcat $Ev1 $Ev2)))))
 
 ;For two sentence, if the stamp is disjoint, we can revise, else return the higher-confident option:
 (= (revise_or_choice_=/> (@ $s1 (Sentence ($term (@ $truth1 (stv $f1 $c1))) $Ev1))

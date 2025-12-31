@@ -14,8 +14,6 @@ text += "I went to the fridge. I opened it. I took out the pizza. The pizza fell
 text += "I ran to the fridge. I opened it. I took out the milk. The milk fell to the floor. Then I picked it up. Finally I drank it. "
 text += "I ran to the fridge. I opened it. I took out the bread. The bread fell to the floor. Then I put it to the trash. "
 
-
-
 text = text * 5
 
 metta = PeTTa()
