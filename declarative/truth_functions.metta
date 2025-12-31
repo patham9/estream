@@ -102,4 +102,4 @@
    (+ (* $c (- $f 0.5)) 0.5))
 
 (= (Truth_Sequence (stv $a $c1) (stv $b $c2))
-   (stv (* $a $b) 0.9))
+   (stv (* $a $b) (min $c1 $c2)))
