@@ -46,8 +46,9 @@
           ($newid (id))
           ($anticipations  (collapse (Anticipate $sequence $novelEvents $newid)))
           ((Sentence ($Term2 $STV2) $Ev2) (superpose $novelEvents)))
-         (if (and (!= $Term2 t)
-                  (not (is-member t $Term2)))
+         (if (and (and (!= $Term2 t)
+                       (not (is-member t $Term2)))
+                  (not (is-member $Term2 (get-state &actions))))
              (Sentence ((=/> $Term1 $Term2) (Truth_Eternalize (Truth_Induction $STV1 $STV2))) (StampConcat $Ev1 $Ev2)))))
 
 ;For two sentence, if the stamp is disjoint, we can revise, else return the higher-confident option:
@@ -91,33 +92,38 @@
                                                 (($cpostcond HYPOTHESIS $cterm) (Truth_Deduction $seqtv $ctv)))))
         (BestCandidate ExpectationRank () $Preds)))
 
+(= (printif! $cond $term)
+   (if $cond
+       (println! $term)
+       True))
+
 ;Add event to sequence reasoner, triggering a strictly-bounded amount of inference:
 (= (AddEvent $term) (AddEvent $term True))
 (= (AddEvent $term $adapting)
-   (let* (($tmpper (println! (PERCEIVED $term)))
+   (let* (($tmpper (printif! $adapting (PERCEIVED $term)))
           ;1. Add each term as an event:
           ($obs (collapse (for $evterm $term (Sentence ($evterm (stv 1.0 0.9)) ((id))))))
           ;2. Add declarative inference reults from each event considering our kb, subtracting kb items from the results:
           ($params ((Declarative.MaxSteps) (Declarative.TaskQueueSize) (Declarative.BeliefQueueSize)))
           ($dec (subtraction-atom (list_to_set (append $obs (foldl-atom (collapse (for $s $obs (last (NARS.Derive False ($s) (collapse (kbitem)) $params))))
                                                                         () append))) (kb)))
-          ($tmpdec (println! (DEC $dec)))
+          ($tmpdec (printif! $adapting (DEC $dec)))
           ;3. Form temporal disjunction between all the inputs and derived events:
           ($parconj (foldl-atom (collapse (let $k (range 2 (+ 1 (min (Temporal.MaxParallelConjunctionLength) (length $dec))))
                                                (foldl-atom (map-atom (chooseK $dec $k) (-> ($x) ($x))) Nil (build_sequence_step &|)))) () append))
-          ($tmpconc (println! (CONC $parconj)))
+          ($tmpconc (printif! $adapting (CONC $parconj)))
           ;4. Novel events (inputs + additional declarative inference results, concurrent conjunctions:
           ($novel_events (append $dec $parconj))
           ;5. Obtain new temporal induction results based on the new combined events:
           ($hyps (if $adapting (collapse (TemporalInduction $novel_events)) ()))
-          ($temp3 (println! (INDUCED $hyps)))
+          ($temp3 (printif! $adapting (INDUCED $hyps)))
           ;6. Update FIFO with the novel events:
           ($temp4 (EventPushBounded $novel_events))
           ;7. Update memory with the new temporal induction results:
           ($hypo (collapse (for $hypo $hyps (Add_=/> $hypo))))
           ;8. Predict what event is most likely to follow:
           ($pred (collapse (PredictMostLikelyNextEvent)))
-          ($tmp2 (println! (PREDICTED $pred)))
-          ($prin (println! (CONCEPTCOUNT (match-count &concepts $anypattern)))))
+          ($tmp2 (printif! $adapting (PREDICTED $pred)))
+          ($prin (printif! $adapting (CONCEPTCOUNT (match-count &concepts $anypattern)))))
          $pred))
 

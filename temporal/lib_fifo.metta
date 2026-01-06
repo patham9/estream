@@ -3,6 +3,14 @@
 ;Initialize global queue with size 0:
 !(bind! &queue (new-state (queue () () 0)))
 
+;Backup of entire FIFO
+(= (FIFO-Backup)
+   (get-state &queue))
+
+;Restoration of FIFO:
+(= (FIFO-Restore $backup)
+   (change-state! &queue $backup))
+
 ;Push event (increment handled by enqueue):
 (= (EventPush $E)
    (let $newqueue (enqueue $E (get-state &queue))

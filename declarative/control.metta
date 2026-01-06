@@ -53,7 +53,7 @@
                                                        ((($T $TV) (Sentence ($T $TV) $stamp))))
                                                  (empty)))
                                        (case (|- $x) ((($T3 $TV3) (Sentence ($T3 $TV3) $Ev1)))))))
-                 (let $temp (trace! (SELECTED $steps (Sentence $x $Ev1)) 42)
+                 (let $temp nope ;(trace! (SELECTED $steps (Sentence $x $Ev1)) 42)
                             (NARS.Derive $Bidrectional
                                          (LimitSize (exclude-item (Sentence $x $Ev1) (list_to_set (append $Tasks $derivations))) $taskqueuesize)
                                          (LimitSize (list_to_set (append $Beliefs $derivations)) $beliefqueuesize)
