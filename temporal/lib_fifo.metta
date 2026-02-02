@@ -35,8 +35,7 @@
 ;Bounded push: if size > 10, pop one first:
 (= (EventBound) 30)
 (= (EventPushBounded $E)
-   (let $q (get-state &queue)
-        (if (> (EventSize) (EventBound))
-            ((EventPop)
-             (EventPush $E))
-            (EventPush $E))))
+   (if (> (EventSize) (EventBound))
+       ((EventPop)
+        (EventPush $E))
+       (EventPush $E)))

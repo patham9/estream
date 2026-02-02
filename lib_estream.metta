@@ -37,3 +37,7 @@
 (= (GetBeliefTVAndExp $c)
    (let $tv (GetBeliefTV $c)
         ($tv (Truth_Expectation $tv))))
+
+(= (QueryBest (@ $query (=/> $precon $postcon)))
+   (let (($postcon $label $hypterm) $tv) (BestCandidate ExpectationRank () (collapse (($postcon HYP $query) (GetBeliefTV $query))))
+        ($hypterm $tv)))
