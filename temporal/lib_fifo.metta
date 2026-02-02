@@ -36,6 +36,6 @@
 (= (EventBound) 30)
 (= (EventPushBounded $E)
    (if (> (EventSize) (EventBound))
-       ((EventPop)
-        (EventPush $E))
+       (progn (EventPop)
+              (EventPush $E))
        (EventPush $E)))
